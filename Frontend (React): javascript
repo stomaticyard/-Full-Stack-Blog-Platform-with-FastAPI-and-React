@@ -1,0 +1,45 @@
+import React, { useState, useEffect } from "react";
+
+function App() {
+    const [posts, setPosts] = useState([]);
+    const [title, setTitle] = useState("");
+    const [content, setContent] = useState("");
+    const [author, setAuthor] = useState("");
+
+    useEffect(() => {
+        fetch("http://localhost:8000/posts")
+            .then((res) => res.json())
+            .then((data) => setPosts(data));
+    }, []);
+
+    const createPost = async () => {
+        const newPost = { id: posts.length + 1, title, content, author };
+        await fetch("http://localhost:8000/posts", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(newPost),
+        });
+        setPosts([...posts, newPost]);
+    };
+
+    return (
+        <div>
+            <h1>Blog Platform</h1>
+            <input placeholder="Title" onChange={(e) => setTitle(e.target.value)} />
+            <input placeholder="Author" onChange={(e) => setAuthor(e.target.value)} />
+            <textarea placeholder="Content" onChange={(e) => setContent(e.target.value)} />
+            <button onClick={createPost}>Create Post</button>
+            <ul>
+                {posts.map((post) => (
+                    <li key={post.id}>
+                        <h3>{post.title}</h3>
+                        <p>{post.content}</p>
+                        <small>By {post.author}</small>
+                    </li>
+                ))}
+            </ul>
+        </div>
+    );
+}
+
+export default App;
